@@ -1,0 +1,27 @@
+{
+    "name": "garyvv/webCreator",
+    "description": "富文本框内容快速生成网页，图片本地化",
+    "homepage": "https://github.com/garyvv/webCreator",
+    "keywords": ["php", "ueditor", "html", "oss", "backend"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "garyvv",
+            "email": "gary.lv90@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.0.0",
+        "imangazaliev/didom": "^1.12",
+        "guzzlehttp/guzzle": "^6.3",
+        "aliyuncs/oss-sdk-php": "~2.0"
+    },
+    "suggest": {
+        "baum/baum": "Allows to use the DataTree widget"
+    },
+    "autoload": {
+        "psr-4": {
+            "Garyvv\\WebCreator\\": "src/"
+        }
+    }
+}
