@@ -12,8 +12,8 @@
     ],
     "require": {
         "php": ">=7.0.0",
-        "imangazaliev/didom": "^1.*",
-        "guzzlehttp/guzzle": "^6.*",
+        "imangazaliev/didom": "^1.12",
+        "guzzlehttp/guzzle": "^6.3.0",
         "aliyuncs/oss-sdk-php": "~2.0"
     },
     "autoload": {
