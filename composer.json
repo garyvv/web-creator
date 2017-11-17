@@ -1,7 +1,7 @@
 {
-    "name": "garyvv/webCreator",
+    "name": "garyvv/web-creator",
     "description": "富文本框内容快速生成网页，图片本地化",
-    "homepage": "https://github.com/garyvv/webCreator",
+    "homepage": "https://github.com/garyvv/web-creator",
     "keywords": ["php", "ueditor", "html", "oss", "backend"],
     "license": "MIT",
     "authors": [
