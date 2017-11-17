@@ -4,9 +4,8 @@ namespace Garyvv\WebCreator;
 
 use DiDom\Document;
 use GuzzleHttp\Client;
-use OSS\OssClient;
 
-class WebCreator
+class WeChatCreator extends Oss implements Creator
 {
 	public $html;
 	public $images;
@@ -15,14 +14,6 @@ class WebCreator
     public $header;
     public $footer;
 
-    public $aliOssBucket;
-    public $aliOssAppId;
-    public $aliOssAppSecret;
-    public $aliOssEndpoint;
-    public $aliOssViewDomain;
-
-    public $ossPrefix = '';
-
     private $isOss = false;
 
 	private $editFlag = 'EDIT-FLAG'; //标识是否已自动加入头部，防止编辑重复
@@ -30,7 +21,27 @@ class WebCreator
 	public function __construct($html)
 	{
 		$this->html = $html;
+
+        $this->header = '<!DOCTYPE html><html><head>
+                <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+                <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0">
+                <meta name="apple-mobile-web-app-capable" content="yes">
+                <meta name="apple-mobile-web-app-status-bar-style" content="black">
+                <meta name="others" content="' . $this->editFlag . '">
+                <meta name="format-detection" content="telephone=no">' . $this->htmlStyle() . '</head>';
+        $this->footer = '</html>';
+
 	}
+
+    private function htmlStyle()
+    {
+        return '<style>
+                    img {
+                        max-width: 100% !important;
+                    }
+                </style>';
+    }
 
 	public function setHeader($header)
 	{
@@ -65,7 +76,7 @@ class WebCreator
         if (isset($config['bucket_prefix'])) $this->ossPrefix = $config['bucket_prefix'];
 	}
 
-	public function dealWeChatImage($dir, $imageServer)
+	public function dealImage($dir, $dirServer, $htmlName = 'article')
 	{
 		$html = new Document($this->html);
 
@@ -73,7 +84,7 @@ class WebCreator
 
         foreach ($html->find('img') as $item) {
             $src = $item->src;
-            if (strpos($src, $imageServer) !== false) {
+            if (strpos($src, $dirServer) !== false) {
 //                本域图片不需处理
                 continue;
             }
@@ -95,7 +106,7 @@ class WebCreator
                 $response = $client->get($src, ['save_to' => $file]);   //保存远程url到文件
             }
 
-            $imageUrl = $imageServer . $fileName;
+            $imageUrl = $dirServer . $fileName;
 
             $this->images[] = [
                 'file_name' => $fileName,
@@ -104,7 +115,17 @@ class WebCreator
             ];
 
             $this->html = str_replace($src, $imageUrl, $this->html);
+
         }
+
+        if (strpos($this->html, $this->editFlag) === false) {
+            $this->html = $this->header . $this->html . $this->footer;
+        }
+
+        $htmlFile = $dir . '/' . $htmlName . '.html';
+        file_put_contents($htmlFile, $this->html);
+
+        $this->link = $dirServer . $htmlName . '.html';
 
 	}
 
@@ -134,35 +155,9 @@ class WebCreator
 //        上传HTML到OSS
         $htmlObject = $this->ossPrefix . $objectName;
 
-        if (strpos($this->html, $this->editFlag) === false) {
-            $this->html = $this->header . $this->html . $this->footer;
-        }
-
         $this->uploadObjectToOSS($htmlObject, $this->html);
 
         $this->link = 'http://' . $this->aliOssViewDomain . '/' . $htmlObject;
     }
 
-
-    private function uploadFileToOSS($object, $file)
-    {
-        if (!is_file($file)) return false;
-
-        $oss = new OssClient($this->aliOssAppId, $this->aliOssAppSecret, $this->aliOssEndpoint);
-        return $oss->uploadFile($this->aliOssBucket, $object, $file);
-    }
-
-    private function uploadObjectToOSS($object, $json)
-    {
-        if (empty($json)) return false;
-
-        $oss = new OssClient($this->aliOssAppId, $this->aliOssAppSecret, $this->aliOssEndpoint);
-        return $oss->putObject($this->aliOssBucket, $object, $json);
-    }
-
-    private function isObjectExist($object)
-    {
-        $oss = new OssClient($this->aliOssAppId, $this->aliOssAppSecret, $this->aliOssEndpoint);
-        return $oss->doesObjectExist($this->aliOssBucket, $object);
-    }
 }
