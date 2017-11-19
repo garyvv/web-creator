@@ -13,7 +13,7 @@ use Garyvv\WebCreator\WeChatCreator;
 
 if (isset($_POST['content'])) {
     $web = new WeChatCreator($_POST['content']);
-    $web->dealImage('/data/htdocs/packagist/storage/images', 'http://packagist.local.com/storage/images/');
+    $web->dealImage('yourDir', 'yourImageServer');
     var_dump($web->link);
 }
 

@@ -7,80 +7,86 @@ use GuzzleHttp\Client;
 
 class WeChatCreator extends Oss implements Creator
 {
-	public $html;
-	public $images;
-	public $link;
+    public $html;
+    public $images;
+    public $link;
 
     public $header;
     public $footer;
 
     private $isOss = false;
 
-	private $editFlag = 'EDIT-FLAG'; //标识是否已自动加入头部，防止编辑重复
+    private $editFlag = 'EDIT-FLAG'; //标识是否已自动加入头部，防止编辑重复
 
-	public function __construct($html)
-	{
-		$this->html = $html;
+    public function __construct($html, $options = [])
+    {
+        $title = '';
+        isset($options['title']) && $title = "<title>" . $options['title'] . "</title>";
 
-        $this->header = '<!DOCTYPE html><html><head>
+        $description = '';
+        isset($options['description']) && $description = "<meta name=\"description\" content=\"" . $options['description'] . "\" />";
+
+        $keywords = '';
+        isset($options['keywords']) && $keywords = "<meta name=\"keywords\" content=\"" . $keywords . "\" />";
+
+
+        $this->html = $html;
+
+        $this->header = '<!DOCTYPE html><html>
+                <head>
                 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
                 <meta http-equiv="X-UA-Compatible" content="IE=edge">
                 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0">
                 <meta name="apple-mobile-web-app-capable" content="yes">
                 <meta name="apple-mobile-web-app-status-bar-style" content="black">
                 <meta name="others" content="' . $this->editFlag . '">
-                <meta name="format-detection" content="telephone=no">' . $this->htmlStyle() . '</head>';
+                <meta name="format-detection" content="telephone=no">
+                ' . $title . $description . $keywords . '
+                </head>';
         $this->footer = '</html>';
 
-	}
-
-    private function htmlStyle()
-    {
-        return '<style>
-                    img {
-                        max-width: 100% !important;
-                    }
-                </style>';
     }
 
-	public function setHeader($header)
-	{
-		$this->htmlHeader = $header;
-	}
+    public function setHeader($header)
+    {
+        $this->header = $header;
+    }
 
-	public function setFooter($footer)
-	{
-		$this->footer = $footer;
-	}
+    public function setFooter($footer)
+    {
+        $this->footer = $footer;
+    }
 
     /**
      * @param $config
      * @throws \Exception
      */
-	public function setOss($config)
-	{
-	    if (!isset($config['bucket']))      throw new \Exception('bucket is required');
-	    if (!isset($config['app_id']))      throw new \Exception('app_id is required');
-	    if (!isset($config['app_secret']))  throw new \Exception('app_secret is required');
-	    if (!isset($config['end_point']))   throw new \Exception('end_point is required');
-	    if (!isset($config['view_domain'])) $config['view_domain'] = 'http://' . $this->aliOssBucket . '.' . $this->aliOssEndpoint;
+    public function setOss($config)
+    {
+        if (!isset($config['bucket'])) throw new \Exception('bucket is required');
+        if (!isset($config['app_id'])) throw new \Exception('app_id is required');
+        if (!isset($config['app_secret'])) throw new \Exception('app_secret is required');
+        if (!isset($config['end_point'])) throw new \Exception('end_point is required');
+        if (!isset($config['view_domain'])) $config['view_domain'] = 'http://' . $this->aliOssBucket . '.' . $this->aliOssEndpoint;
 
-		$this->aliOssBucket 		= $config['bucket'];
-        $this->aliOssAppId 			= $config['app_id'];
-        $this->aliOssAppSecret 		= $config['app_secret'];
-        $this->aliOssEndpoint 		= $config['end_point'];
-        $this->aliOssViewDomain 	= $config['view_domain'];
+        $this->aliOssBucket = $config['bucket'];
+        $this->aliOssAppId = $config['app_id'];
+        $this->aliOssAppSecret = $config['app_secret'];
+        $this->aliOssEndpoint = $config['end_point'];
+        $this->aliOssViewDomain = $config['view_domain'];
 
         $this->isOss = true;
 
         if (isset($config['bucket_prefix'])) $this->ossPrefix = $config['bucket_prefix'];
-	}
+    }
 
-	public function dealImage($dir, $dirServer, $htmlName = 'article')
-	{
-		$html = new Document($this->html);
+    public function dealImage($dir, $dirServer, $htmlName = 'article')
+    {
+        $html = new Document($this->html);
 
         $client = new Client(['verify' => false]);  //忽略SSL错误
+
+        $this->html = htmlspecialchars_decode($this->html);
 
         foreach ($html->find('img') as $item) {
             $src = $item->src;
@@ -127,10 +133,10 @@ class WeChatCreator extends Oss implements Creator
 
         $this->link = $dirServer . $htmlName . '.html';
 
-	}
+    }
 
 
-	public function uploadImageToOss($deleteLocal = true)
+    public function uploadImageToOss($deleteLocal = true)
     {
         foreach ($this->images as $key => $image) {
             $imageObject = $this->ossPrefix . $image['file_name'];
