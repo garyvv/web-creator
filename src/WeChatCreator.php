@@ -27,7 +27,7 @@ class WeChatCreator extends Oss implements Creator
         isset($options['description']) && $description = "<meta name=\"description\" content=\"" . $options['description'] . "\" />";
 
         $keywords = '';
-        isset($options['keywords']) && $keywords = "<meta name=\"keywords\" content=\"" . $keywords . "\" />";
+        isset($options['keywords']) && $keywords = "<meta name=\"keywords\" content=\"" . $options['keywords'] . "\" />";
 
 
         $this->html = $html;
