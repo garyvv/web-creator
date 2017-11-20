@@ -22,10 +22,15 @@ class TmallCreator extends HtmlController implements Creator
 
         $this->html = htmlspecialchars_decode($this->html);
 
-        foreach ($html->find('img') as $item) {
+        foreach ((array)$html->find('img') as $item) {
             $src = $item->src;
             if (strpos($src, $dirServer) !== false) {
 //                本域图片不需处理
+                continue;
+            }
+
+            if (!empty($this->aliOssViewDomain) && strpos($src, $this->aliOssViewDomain) !== false) {
+//                oss域图片不需处理
                 continue;
             }
 

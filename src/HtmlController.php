@@ -53,7 +53,7 @@ class HtmlController extends Oss
 
     public function uploadImageToOss($deleteLocal = true)
     {
-        foreach ($this->images as $key => $image) {
+        foreach ((array)$this->images as $key => $image) {
             $imageObject = $this->ossPrefix . $image['file_name'];
             if ($this->isObjectExist($imageObject) === false) {
 //                上传图片到 OSS
