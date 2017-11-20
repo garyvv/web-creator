@@ -10,10 +10,24 @@
 require_once __DIR__ . '/vendor/autoload.php';
 
 use Garyvv\WebCreator\WeChatCreator;
+use Garyvv\WebCreator\TmallCreator;
 
 if (isset($_POST['content'])) {
-    $web = new WeChatCreator($_POST['content']);
-    $web->dealImage('yourDir', 'yourImageServer');
+//    $web = new WeChatCreator($_POST['content']);
+    $web = new TmallCreator($_POST['content']);
+    $web->dealImage('dir', 'imgServer');
+
+//    传OSS
+    $oss['bucket'] = '';
+    $oss['view_domain'] = '';
+    $oss['end_point'] = '';
+    $oss['bucket_prefix'] = '';
+    $oss['app_id'] = '';
+    $oss['app_secret'] = '';
+    $web->setOss($oss);
+    $web->uploadImageToOss();
+    $web->uploadHtmlToOss('text.html');
+
     var_dump($web->link);
 }
 
