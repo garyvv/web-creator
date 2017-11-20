@@ -16,8 +16,6 @@ class WeChatCreator extends Oss implements Creator
 
     private $isOss = false;
 
-    private $editFlag = 'EDIT-FLAG'; //标识是否已自动加入头部，防止编辑重复
-
     public function __construct($html, $options = [])
     {
         $title = '';
@@ -39,7 +37,6 @@ class WeChatCreator extends Oss implements Creator
                 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0">
                 <meta name="apple-mobile-web-app-capable" content="yes">
                 <meta name="apple-mobile-web-app-status-bar-style" content="black">
-                <meta name="others" content="' . $this->editFlag . '">
                 <meta name="format-detection" content="telephone=no">
                 ' . $title . $description . $keywords . '
                 </head>';
@@ -124,9 +121,7 @@ class WeChatCreator extends Oss implements Creator
 
         }
 
-        if (strpos($this->html, $this->editFlag) === false) {
-            $this->html = $this->header . $this->html . $this->footer;
-        }
+        $this->html = $this->header . $this->html . $this->footer;
 
         $htmlFile = $dir . '/' . $htmlName . '.html';
         file_put_contents($htmlFile, $this->html);
@@ -147,7 +142,7 @@ class WeChatCreator extends Oss implements Creator
                 $deleteLocal === true && @unlink($image['file_dir']);
             }
 
-            $imageUrl = $this->aliOssViewDomain . '/' . $imageObject;
+            $imageUrl = 'http://' . $this->aliOssViewDomain . '/' . $imageObject;
 
             $this->html = str_replace($image['url'], $imageUrl, $this->html);
             $this->images[$key]['url'] = $imageUrl;
