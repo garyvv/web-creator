@@ -5,7 +5,7 @@ namespace Garyvv\WebCreator;
 use DiDom\Document;
 use GuzzleHttp\Client;
 
-class WeChatCreator extends HtmlController implements Creator
+class TmallCreator extends HtmlController implements Creator
 {
 
     public function __construct($html, $options = [])
@@ -29,16 +29,9 @@ class WeChatCreator extends HtmlController implements Creator
                 continue;
             }
 
-//            微信公众号后缀
-            $type = 'jpg';
-            $tmp = explode('wx_fmt=', $src);
-            if (isset($tmp[1])) {
-                $tmp = explode('&', $tmp[1]);
-                isset($tmp[0]) && $type = $tmp[0];
-            }
-
-//            图片名称
-            $fileName = substr(md5($src), 8, 16) . '.' . $type;
+            $tmp = explode('/', $src);
+//            图片名称，使用原名称
+            $fileName = array_pop($tmp);
             $file = $dir . '/' . $fileName;
 
             if (file_exists($file) === false && strpos($src, 'http') !== false) {

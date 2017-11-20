@@ -10,10 +10,12 @@
 require_once __DIR__ . '/vendor/autoload.php';
 
 use Garyvv\WebCreator\WeChatCreator;
+use Garyvv\WebCreator\TmallCreator;
 
 if (isset($_POST['content'])) {
-    $web = new WeChatCreator($_POST['content']);
-    $web->dealImage('yourDir', 'yourImageServer');
+//    $web = new WeChatCreator($_POST['content']);
+    $web = new TmallCreator($_POST['content']);
+    $web->dealImage('/data/htdocs/packagist/storage/html', 'http://packagist.local.com/storage/html/');
     var_dump($web->link);
 }
 
